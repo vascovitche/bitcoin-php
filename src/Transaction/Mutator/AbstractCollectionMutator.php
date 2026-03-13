@@ -4,6 +4,8 @@ namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Countable
 {
+    protected ?\Iterator $iter = null;
+
     /**
      * @var \SplFixedArray
      */
@@ -38,7 +40,8 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function rewind()
     {
-        $this->set->rewind();
+        $this->iter = $this->set->getIterator();
+        $this->iter->rewind();
     }
 
     /**
@@ -46,7 +49,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function current()
     {
-        return $this->set->current();
+        return $this->iterator()->current();
     }
 
     /**
@@ -54,7 +57,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function key()
     {
-        return $this->set->key();
+        return $this->iterator()->key();
     }
 
     /**
@@ -62,7 +65,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function next()
     {
-        $this->set->next();
+        $this->iterator()->next();
     }
 
     /**
@@ -70,7 +73,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
      */
     public function valid()
     {
-        return $this->set->valid();
+        return $this->iterator()->valid();
     }
 
     /**
@@ -113,5 +116,14 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     public function offsetSet($offset, $value)
     {
         $this->set->offsetSet($offset, $value);
+    }
+
+    protected function iterator(): \Iterator
+    {
+        if ($this->iter === null) {
+            $this->iter = $this->set->getIterator();
+        }
+
+        return $this->iter;
     }
 }
